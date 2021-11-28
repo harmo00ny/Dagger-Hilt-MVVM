@@ -1,20 +1,20 @@
 package com.marysugar.dagger_hilt_mvvm.ui
 
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.marysugar.dagger_hilt_mvvm.model.Blog
 import com.marysugar.dagger_hilt_mvvm.repository.MainRepository
 import com.marysugar.dagger_hilt_mvvm.util.DataState
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@HiltViewModel
 class MainViewModel
-@ViewModelInject
+@Inject
 constructor(
-    private val mainRepository: MainRepository,
-    @Assisted private val savedStateHandle: SavedStateHandle
+    private val mainRepository: MainRepository
 ) : ViewModel() {
     private val _dataState: MutableLiveData<DataState<List<Blog>>> = MutableLiveData()
 
