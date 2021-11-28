@@ -1,7 +1,5 @@
 package com.marysugar.dagger_hilt_mvvm.di
 
-import com.marysugar.dagger_hilt_mvvm.database.BlogDao
-import com.marysugar.dagger_hilt_mvvm.database.CacheMapper
 import com.marysugar.dagger_hilt_mvvm.network.BlogApi
 import com.marysugar.dagger_hilt_mvvm.network.BlogMapper
 import com.marysugar.dagger_hilt_mvvm.repository.MainRepository
@@ -18,11 +16,9 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideMainRepository(
-        blogDao: BlogDao,
         blogApi: BlogApi,
-        cacheMapper: CacheMapper,
         blogMapper: BlogMapper
     ): MainRepository {
-        return MainRepository(blogDao, blogApi, cacheMapper, blogMapper)
+        return MainRepository(blogApi, blogMapper)
     }
 }
