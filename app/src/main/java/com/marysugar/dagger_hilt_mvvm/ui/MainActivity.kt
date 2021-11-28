@@ -17,7 +17,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), BlogAdapter.BlogItemListener {
+class MainActivity : AppCompatActivity(), BlogAdapter.PostsAdapterListener {
     private val viewModel: MainViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: BlogAdapter
@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity(), BlogAdapter.BlogItemListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setupRecyclerView()
         subscribeObservers()
         viewModel.setStateEvent(MainStateEvent.GetBlogEvents)
 
@@ -67,17 +66,15 @@ class MainActivity : AppCompatActivity(), BlogAdapter.BlogItemListener {
     }
 
     private fun populateRecyclerView(blogs: List<Blog>) {
-        if (blogs.isNotEmpty()) adapter.setItems(ArrayList(blogs))
+        if (blogs.isNotEmpty()) setupRecyclerView(blogs)
     }
 
-    private fun setupRecyclerView() {
-        adapter = BlogAdapter(this)
+    private fun setupRecyclerView(blogs: List<Blog>) {
+        adapter = BlogAdapter(blogs, this)
         binding.myAdapter = adapter
         binding.blogRecyclerview.layoutManager = LinearLayoutManager(this)
     }
 
-    override fun onClickedBlog(blogTitle: CharSequence) {
-        Toast.makeText(this, blogTitle, Toast.LENGTH_SHORT).show()
+    override fun onPostClicked(post: Blog?) {
     }
-
 }

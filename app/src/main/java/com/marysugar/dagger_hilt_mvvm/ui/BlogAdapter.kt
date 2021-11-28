@@ -1,69 +1,66 @@
 package com.marysugar.dagger_hilt_mvvm.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.appcompat.widget.AppCompatImageView
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.ImageView
+import androidx.databinding.BindingAdapter
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.marysugar.dagger_hilt_mvvm.R
+import com.marysugar.dagger_hilt_mvvm.databinding.ItemBlogBinding
 import com.marysugar.dagger_hilt_mvvm.model.Blog
-import kotlinx.android.synthetic.main.item_blog.view.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class BlogAdapter(private val listener: BlogItemListener) : RecyclerView.Adapter<BlogViewHolder>() {
 
-    interface BlogItemListener {
-        fun onClickedBlog(blogTitle: CharSequence)
+@ExperimentalCoroutinesApi
+class BlogAdapter (private val blogs: List<Blog>, listener: MainActivity) :
+    RecyclerView.Adapter<BlogAdapter.ItemViewHolder>() {
+    private val listener: PostsAdapterListener?
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
+        val binding: ItemBlogBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(parent.context),
+            R.layout.item_blog, parent, false);
+        return ItemViewHolder(binding)
     }
 
-    private val items = ArrayList<Blog>()
-    private lateinit var blog: Blog
-
-    fun setItems(items: ArrayList<Blog>) {
-        this.items.clear()
-        this.items.addAll(items)
-        notifyDataSetChanged()
+    inner class ItemViewHolder(itemBinding: ItemBlogBinding) : ViewHolder(itemBinding.root) {
+        val binding = itemBinding
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlogViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_blog, parent, false)
-        return BlogViewHolder(view, listener)
+    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        holder.binding.model = blogs[position]
+        holder.binding.image.setOnClickListener {
+            listener?.onPostClicked(post = blogs[position])
+        }
     }
 
-    override fun getItemCount(): Int = items.size
-
-
-    override fun onBindViewHolder(holder: BlogViewHolder, position: Int) {
-        blog = items[position]
-        val blog = items[position]
-        holder.textTitle.text = blog.title
-        holder.textDescription.text = blog.body
-        Glide.with(holder.itemLayout).load(blog.image)
-            .placeholder(R.drawable.placeholder)
-            .error(R.drawable.placeholder)
-            .apply(RequestOptions().centerCrop())
-            .into(holder.image)
+    // 画像をセット
+    companion object {
+        @JvmStatic
+        @BindingAdapter("profileImage")
+        fun loadImage(view: ImageView, imageUrl: String?) {
+            if(imageUrl != null) {
+                Glide.with(view.context)
+                    .load(imageUrl).apply(RequestOptions().circleCrop())
+                    .into(view)
+            }
+        }
     }
-}
 
-class BlogViewHolder(itemView: View, private val listener: BlogAdapter.BlogItemListener) :
-    RecyclerView.ViewHolder(itemView),
-    View.OnClickListener {
+    override fun getItemCount(): Int {
+        return blogs.size
+    }
 
-    val itemLayout: ConstraintLayout = itemView.blog_layout
-    val textTitle: TextView = itemView.text_title
-    val textDescription: TextView = itemView.text_description
-    val image: AppCompatImageView = itemView.image
+    interface PostsAdapterListener {
+        fun onPostClicked(post: Blog?)
+    }
 
     init {
-        itemLayout.setOnClickListener(this)
-    }
-
-    override fun onClick(v: View?) {
-        listener.onClickedBlog(textTitle.text)
+        this.listener = listener
     }
 }
 
