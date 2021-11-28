@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.marysugar.dagger_hilt_mvvm.R
+import com.marysugar.dagger_hilt_mvvm.databinding.ActivityMainBinding
 import com.marysugar.dagger_hilt_mvvm.model.Blog
 import com.marysugar.dagger_hilt_mvvm.util.DataState
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,11 +19,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), BlogAdapter.BlogItemListener {
     private val viewModel: MainViewModel by viewModels()
+    private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: BlogAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setupRecyclerView()
         subscribeObservers()
         viewModel.setStateEvent(MainStateEvent.GetBlogEvents)
@@ -69,8 +72,8 @@ class MainActivity : AppCompatActivity(), BlogAdapter.BlogItemListener {
 
     private fun setupRecyclerView() {
         adapter = BlogAdapter(this)
-        blog_recyclerview.layoutManager = LinearLayoutManager(this)
-        blog_recyclerview.adapter = adapter
+        binding.myAdapter = adapter
+        binding.blogRecyclerview.layoutManager = LinearLayoutManager(this)
     }
 
     override fun onClickedBlog(blogTitle: CharSequence) {
